@@ -58,7 +58,7 @@ jobs:
           bash scripts/test-artifact-approval.sh
       - name: Independently test and build
         run: nix develop --command make test
-      - name: Validate raw WASM notice embedding (publication blocker until tooling exists)
+      - name: Validate final raw WASM and embedded notice bytes
         run: |
           set -euo pipefail
           nix develop --command wasm-tools validate dist/plugin.fs.wasm

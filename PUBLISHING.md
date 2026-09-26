@@ -1,6 +1,6 @@
-# plugin.fs pilot publishing (proposal, not authorization)
+# plugin.fs pilot publishing
 
-This scaffold targets the standalone **`kkgams/plugin.fs`** repository. No publication has been performed. The proposed Distribution Version is **`0.1.0`** (tag `v0.1.0`), separate from WIT **`gams:fs@1.2.0`** (export `gams:fs/fs@1.2.0`). The proposed raw component location is **`ghcr.io/kkgams/gams/fs:0.1.0`**; no mutable `latest` tag is pushed. The GitHub Release would attach `plugin.fs.wasm`, `LICENSE`, `NOTICE`, and `SHA256SUMS` covering all three payload files.
+The owner authorized proceeding with the Apache-2.0/WASI WIT publishing pilot and accepted responsibility for the licensing decision. This scaffold targets the standalone **`kkgams/plugin.fs`** repository. No approval variables, tags, or publication have been created by the assistant. The proposed Distribution Version is **`0.1.0`** (tag `v0.1.0`), separate from WIT **`gams:fs@1.2.0`** (export `gams:fs/fs@1.2.0`). The proposed raw component location is **`ghcr.io/kkgams/gams/fs:0.1.0`**; no mutable `latest` tag is pushed. The GitHub Release would attach `plugin.fs.wasm`, `LICENSE`, `NOTICE`, and `SHA256SUMS` covering all three payload files.
 
 ## Safety contract
 
@@ -12,11 +12,18 @@ Only then can the tag candidate be staged and uploaded. The publish job download
 
 `verify.yml` is a separate branch candidate CI workflow, not this release workflow. It also checks the exact embedded LICENSE/NOTICE bytes before allowing the separately approved CI artifact upload. A CI candidate still does not grant OCI release approval; the two approval booleans are distinct.
 
-## Owner and integration blockers
+## Owner-controlled enablement and remaining verification
 
-- Owner reviews/approves the exact proposed Apache 2.0 `LICENSE`, rights to GAMS-authored code, GAMS attribution, updated `NOTICE`, W3C CLA attribution for adapted WASI Preview 2 WIT, and complete third-party inventory; no speculative approval variables. See `THIRD-PARTY-REVIEW.md`.
+- The owner's authorization to proceed is recorded in `RELEASE-CHECKLIST.md`. The owner must set the exact `LICENSE` and `NOTICE` SHA-256 repository variables and explicit upload/release approval variables using their GitHub credentials; the assistant does not set them. If either file changes, the approvals must be updated deliberately before distribution. See `THIRD-PARTY-REVIEW.md`.
 - The release shell has pinned `wkg` 0.15.0, but its actual Linux release-path build, GitHub/GHCR credentials, registry/package visibility, and byte-equivalence behavior require hosted validation. The normal build shell does not have to build `wkg`.
 - `packaging/ecosystem/components.py` copies this release workflow, scripts, and documentation into the prepared standalone `plugin.fs` repo. Keep pilot coordinates aligned with the repository name and WIT declaration.
 - Record a successful clean standalone Linux verification run and its commit, then review all checks in [RELEASE-CHECKLIST.md](RELEASE-CHECKLIST.md) before the owner creates any tag. No publication has been attempted here.
 
-Offline safety checks: `bash scripts/test-release-oci-preflight.sh` and `bash scripts/test-artifact-approval.sh`. A branch manual run requires owner approval but never publishes. A tag run is publication-capable only after every blocker is resolved; don't create a tag merely to test the scaffold.
+## Owner execution order (only after syncing the verified `release` commit)
+
+1. Push `release` and inspect the hosted Linux `verify.yml` result for that **exact commit**. Neither approval boolean should be set merely to test the branch build.
+2. From the standalone repo, record `sha256sum LICENSE NOTICE` and set repository variables `GAMS_FS_LICENSE_SHA256` and `GAMS_FS_NOTICE_SHA256` to those **exact current** digests. Set `GAMS_FS_ARTIFACT_UPLOAD_APPROVED=true`, then manually rerun `verify.yml` on `release` and inspect the downloadable candidate, embedded notices, and `SHA256SUMS`.
+3. Check GHCR package-write policy/visibility. Set the distinct `GAMS_FS_RELEASE_APPROVED=true` variable and manually run `release.yml` on `release`; it verifies on Linux but must **not** publish on a branch.
+4. Only after successful hosted runs, the owner creates/pushes `v0.1.0` on that same verified commit. The tag run is publication-capable: review its GHCR artifact, GitHub Release assets, checksums and raw-WASM notices. Do not create a tag simply to test the scaffold.
+
+Offline safety checks: `bash scripts/test-release-oci-preflight.sh`, `bash scripts/test-release-absent.sh`, and `bash scripts/test-artifact-approval.sh`. Revoke/disable the approval variables when the pilot is done if they are not intended to remain active. If either notice file changes, **re-review and reset its approved digest before another distribution**.

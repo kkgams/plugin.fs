@@ -30,8 +30,8 @@ jobs:
           python3 scripts/wasm-notices.py verify dist/plugin.fs.wasm --license LICENSE --notice NOTICE
           test -s dist/plugin.fs.wasm
           (cd dist && sha256sum plugin.fs.wasm > SHA256SUMS && sha256sum --check SHA256SUMS)
-      # Public GitHub Actions artifacts are distribution. Never upload a WASM
-      # from this unlicensed snapshot; approving both exact texts is required.
+      # Public GitHub Actions artifacts are distribution. Upload only when the
+      # owner enables this separate gate and approves both exact texts.
       - name: Approve candidate bytes and stage licensing files
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/release' && vars.GAMS_FS_ARTIFACT_UPLOAD_APPROVED == 'true'
         shell: bash
