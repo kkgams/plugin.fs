@@ -2,17 +2,18 @@
 
 ## Scope and status
 
-This engineering inventory concerns the standalone source snapshot at
-`/Users/gook/Repos/kkgams-local/plugin.fs` and its **actual**
-`dist/plugin.fs.wasm` (SHA-256
+This engineering inventory began with the standalone source snapshot at
+`/Users/gook/Repos/kkgams-local/plugin.fs` and its **then-current**
+`dist/plugin.fs.wasm` (historical SHA-256
 `1cb9292fef8906180374134d79664e66204e3eecf833c2d72b1ba659073b14e3`).
+Rebuilds after embedding notices have different bytes; repeat the inventory on
+release builders.
 It is not a review of the repository's `node_modules`, generated test JS, or
 other plugins. `NOTICE` contains third-party notices for linked or conservatively
-embedded material. The owner must separately supply and approve the project's
-Apache-2.0 `LICENSE` using the exact official license text
-(https://www.apache.org/licenses/LICENSE-2.0.txt); this review does not grant a
-license to GAMS-authored files or authorize publication. The snapshot's
-`LICENSING.md` explicitly says not to publish pending owner approval.
+embedded material. The proposed Apache-2.0 `LICENSE` has since been supplied from the official
+text (https://www.apache.org/licenses/LICENSE-2.0.txt), but still requires owner
+approval and confirmation of rights to GAMS-authored files; this audit does not
+authorize publication. `LICENSING.md` says not to publish pending that review.
 
 **No Odin or Lua notice belongs in this component.** `src/` contains one
 project C implementation, `plugin.mk`, a project WIT file and three WASI WIT
@@ -102,16 +103,34 @@ artifact review; distributing them requires a separate inventory.
   `e79b05803e9ffd3b0cfdc0a8af20ac743abbe36a`, and `wasi-io` commit
   `324be895965666805cb1c622ed4f071b9e3cbd65` (all tag `v0.2.0`).
   These bundled `package.wit` files are **abbreviated/adapted**, not byte-for-byte
-  copies of upstream full WIT files. The `wasi-io` tag includes a W3C Community
-  Contributor License Agreement copyright notice; its exact text is included
-  conservatively in `NOTICE`. The historical `wasi-clocks` and
-  `wasi-filesystem` v0.2.0 tag trees do **not** carry a root LICENSE file.
-  Before authorizing public source/binary distribution, obtain an owner/counsel
-  determination of rights to redistribute the adapted WIT descriptions and
-  provide any additional required attribution or replace them with clearly
-  licensed canonical WIT sources. Do not infer that the generated bindings'
-  MIT notice, the W3C CLA notice, or this project's Apache license grants
-  rights over upstream WIT inputs.
+  copies of upstream full WIT files. Earlier review only looked for LICENSE files
+  in the individual proposal repositories and missed a better source: the
+  [WebAssembly/WASI `v0.2.0` release](https://github.com/WebAssembly/WASI/tree/v0.2.0)
+  has [`LICENSE.md`](https://github.com/WebAssembly/WASI/blob/v0.2.0/LICENSE.md)
+  explicitly identifying the W3C Community Contributor License Agreement (CLA).
+  Its [`preview2/README.md`](https://github.com/WebAssembly/WASI/blob/v0.2.0/preview2/README.md)
+  identifies the clocks, filesystem, and io WIT APIs as WASI Preview 2 version
+  `0.2.0`. Byte comparisons confirm its `preview2/clocks/wall-clock.wit`,
+  `preview2/filesystem/types.wit`, and `preview2/io/streams.wit` are identical
+  to the respective individual proposal-repository `v0.2.0` sources. The
+  absence of a license file in the historical clocks/filesystem *proposal*
+  repositories is therefore not evidence that the published WASI 0.2 WIT
+  specifications are unlicensed.
+
+  [W3C CLA §2.1](https://www.w3.org/community/about/process/cla/) grants
+  recipients permission to reproduce, adapt, sublicense, distribute, and
+  implement *Contributions to the Specification*; §2.2 requires derivative
+  works to identify the Specification by **name and version**. The proposed
+  `NOTICE` identifies WASI Preview 2 / WASI 0.2 and the three WIT packages
+  at `0.2.0`, records that their WIT was abbreviated/adapted, and preserves
+  the upstream copyright text. The CLA §1 excludes source code *outside* the
+  Specification: this analysis relies on these WIT API declarations and their
+  documentation being part of the WASI Preview 2 Specification, as described
+  in its README. It is not a blanket license for arbitrary code in the repos.
+  Do not infer that the generated bindings' MIT notice or GAMS's Apache
+  license grants rights over upstream WIT. Owner review of this documented
+  interpretation and exact attribution is still required; seek counsel if the
+  classification of any particular adapted text remains disputed.
 - Project-owned `src/component.c`, `src/wit/package.wit`, generated outputs
   and extracted snapshot still require owner approval of the project license;
   the owner should replace the current no-license warning in the eventual

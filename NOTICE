@@ -9,9 +9,15 @@ the plugin.fs WebAssembly component, not a license for GAMS-authored files.
 The project license is separate. Build-only tools are not included here.
 
 ==============================================================================
-WASI WIT specification provenance (upstream notice, not an Apache-2.0 grant)
-Source: https://raw.githubusercontent.com/WebAssembly/wasi-io/324be895965666805cb1c622ed4f071b9e3cbd65/LICENSE.md
+WASI Preview 2 / WASI 0.2 specification attribution (not Apache-2.0 code)
+Source: https://github.com/WebAssembly/WASI/tree/v0.2.0/preview2
+License notice: https://github.com/WebAssembly/WASI/blob/v0.2.0/LICENSE.md
+Terms: https://www.w3.org/community/about/process/cla/ (sections 2.1 and 2.2)
 ==============================================================================
+
+This component's dependency WIT adapts/abbreviates the WASI Preview 2
+specification APIs wasi:clocks@0.2.0, wasi:filesystem@0.2.0, and wasi:io@0.2.0.
+The upstream source is not relicensed under GAMS's Apache-2.0 license.
 
 Copyright © 2019-2023 the Contributors to the WASI Specification, published
 by the [WebAssembly Community Group][cg] under the
