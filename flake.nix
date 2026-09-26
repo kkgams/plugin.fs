@@ -1,5 +1,5 @@
 {
-  description = "GAMS standalone component build toolchain";
+  description = "GAMS filesystem component build and release toolchain";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/d233902339c02a9c334e7e593de68855ad26c4cb";
@@ -15,9 +15,13 @@
       url = "github:bytecodealliance/wit-bindgen/v0.57.1";
       flake = false;
     };
+    wkg-src = {
+      url = "github:bytecodealliance/wasm-pkg-tools/v0.15.0";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs, odin-src, wasm-tools-src, wit-bindgen-src }:
+  outputs = { self, nixpkgs, odin-src, wasm-tools-src, wit-bindgen-src, wkg-src }:
     let
       systems = [ "aarch64-darwin" "x86_64-darwin" "aarch64-linux" "x86_64-linux" ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
@@ -122,6 +126,23 @@
             };
           };
           wasiArtifact = wasiArtifacts.${system};
+          wkg = pkgs.rustPlatform.buildRustPackage {
+            pname = "wkg";
+            version = "0.15.0";
+            src = wkg-src;
+            cargoDeps = (pkgs.rustPlatform.importCargoLock.override {
+              fetchurl = args: pkgs.fetchurl (args // {
+                url = builtins.replaceStrings
+                  [ "https://crates.io/api/v1/crates" ]
+                  [ "https://static.crates.io/crates" ]
+                  args.url;
+              });
+            }) {
+              lockFile = "${wkg-src}/Cargo.lock";
+            };
+            cargoBuildFlags = [ "-p" "wkg" ];
+            cargoTestFlags = [ "-p" "wkg" "--no-default-features" ];
+          };
           wasi-sdk = pkgs.stdenvNoCC.mkDerivation (linuxPatching // {
             pname = "wasi-sdk";
             version = "33.0";
@@ -147,6 +168,10 @@
               export WASI_SYSROOT="$WASI_SDK_PATH/share/wasi-sysroot"
               export PATH="$PATH:$WASI_SDK_PATH/bin"
             '';
+          };
+          release = pkgs.mkShell {
+            inputsFrom = [ self.devShells.${system}.default ];
+            packages = [ wkg pkgs.curl ];
           };
         });
     };

@@ -1,16 +1,22 @@
-# Licensing status
+# Licensing and redistribution gate
 
-**Do not publish or release this repository.** The repository owner's approval of
-the license for the GAMS-authored source is unresolved. No license is granted by
-this extraction, and no `LICENSE` file is supplied or implied.
+Proposed first-party license for `plugin.fs`: **Apache License 2.0**. The root
+`LICENSE` contains the exact unmodified Apache 2.0 text downloaded from
+`https://www.apache.org/licenses/LICENSE-2.0.txt` (SHA-256
+`cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30`).
+The root `NOTICE` includes proposed GAMS copyright attribution and the reviewed
+third-party texts; see `THIRD-PARTY-REVIEW.md` for scope and unresolved provenance.
+This does not retroactively relicense unrelated plugins or Director Compiler.
 
-Before publication, the owner must choose and approve a license, apply it to the
-GAMS-authored files, and review the complete linked and vendored third-party
-inventory. That inventory must cover the local WIT packages, generated bindings,
-the WASI SDK/toolchain runtime objects, and every source file linked into the WASM
-artifact. Component-specific vendored sources (notably Lua and jsmn-derived code)
-need provenance, license-text, notice, and redistribution review. Build-tool npm
-and Nix closures also require the appropriate source-distribution review.
+**Before a public CI artifact, GHCR push, or GitHub Release:** the owner must
+approve the exact `LICENSE` and `NOTICE` bytes, copyright attribution, WIT
+provenance and complete applicable third-party obligations. Approval must be
+recorded in the repository variables named in `PUBLISHING.md`. Do not set them
+speculatively. Local builds and non-uploading CI verification are allowed while
+these distribution gates remain unset.
 
-The verification workflow only builds and tests. It is not a release or publish
-workflow and grants no permission to distribute its artifacts.
+Raw WASM now embeds both exact files after stripping, in custom sections named
+`gams.license` and `gams.notice`; uploading a component stripped again after the
+embedding step would remove the notices and fail the verification gate.
+
+This is an engineering preparation, not legal advice or final distribution approval.

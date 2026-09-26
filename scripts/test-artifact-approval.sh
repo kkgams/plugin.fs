@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
-script="$(cd "$(dirname "$0")" && pwd)/check-artifact-approval.sh"
+source_dir="$(cd "$(dirname "$0")" && pwd)"
+script="$source_dir/check-artifact-approval.sh"
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 cd "$work"
-mkdir dist
+mkdir dist scripts
+cp "$source_dir/wasm-notices.py" scripts/wasm-notices.py
 printf 'test license\n' > LICENSE
 printf 'test notice\n' > NOTICE
 printf '\0asm\r\0\1\0' > dist/plugin.fs.wasm
+python3 scripts/wasm-notices.py embed dist/plugin.fs.wasm --license LICENSE --notice NOTICE
 (cd dist && sha256sum plugin.fs.wasm > SHA256SUMS)
 export APPROVED=true
 export APPROVED_LICENSE_SHA256="$(sha256sum LICENSE | awk '{print $1}')"
@@ -30,9 +33,11 @@ mv saved-notice NOTICE
 printf 'changed\n' >> NOTICE
 reject
 printf 'test notice\n' > NOTICE
-printf '\0' >> dist/plugin.fs.wasm
-reject
 printf '\0asm\r\0\1\0' > dist/plugin.fs.wasm
+(cd dist && sha256sum plugin.fs.wasm > SHA256SUMS)
+reject  # A correctly checksummed WASM stripped of notices is still invalid.
+python3 scripts/wasm-notices.py embed dist/plugin.fs.wasm --license LICENSE --notice NOTICE
+(cd dist && sha256sum plugin.fs.wasm > SHA256SUMS)
 bash "$script"
 (cd dist && sha256sum --check SHA256SUMS)
 echo 'CI candidate licensing gate tests passed'

@@ -27,5 +27,6 @@ if [[ "$license_hash" != "$APPROVED_LICENSE_SHA256" || "$notice_hash" != "$APPRO
 fi
 # The build job validated and checksummed this exact WASM before the gate.
 (cd dist && sha256sum --check SHA256SUMS)
+python3 scripts/wasm-notices.py verify dist/plugin.fs.wasm --license LICENSE --notice NOTICE
 cp LICENSE NOTICE dist/
 (cd dist && sha256sum plugin.fs.wasm LICENSE NOTICE > SHA256SUMS && sha256sum --check SHA256SUMS)

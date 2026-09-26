@@ -15,8 +15,11 @@ jobs:
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0 (Node 24)
       - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22 (Node 24)
-      - name: Test candidate distribution approval gate
-        run: bash scripts/test-artifact-approval.sh
+      - name: Test candidate and release safety gates without credentials
+        run: |
+          bash scripts/test-artifact-approval.sh
+          bash scripts/test-release-oci-preflight.sh
+          bash scripts/test-release-absent.sh
       - name: Independently build and test
         run: nix develop --command make test
       - name: Validate exact component and checksum
@@ -24,6 +27,7 @@ jobs:
         run: |
           set -euo pipefail
           nix develop --command wasm-tools validate dist/plugin.fs.wasm
+          python3 scripts/wasm-notices.py verify dist/plugin.fs.wasm --license LICENSE --notice NOTICE
           test -s dist/plugin.fs.wasm
           (cd dist && sha256sum plugin.fs.wasm > SHA256SUMS && sha256sum --check SHA256SUMS)
       # Public GitHub Actions artifacts are distribution. Never upload a WASM

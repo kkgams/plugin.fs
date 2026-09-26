@@ -1,0 +1,152 @@
+name: Release plugin.fs (pilot)
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fs-release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  # Pilot coordinates are proposals; change deliberately for a later release.
+  VERSION: '0.1.0'
+  WIT_VERSION: '1.2.0'
+  OCI_REF: ghcr.io/kkgams/gams/fs:0.1.0
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0 (Node 24)
+      - name: Gate identity and exact owner-approved licensing bytes before build
+        shell: bash
+        env:
+          APPROVED: ${{ vars.GAMS_FS_RELEASE_APPROVED }}
+          APPROVED_LICENSE_SHA256: ${{ vars.GAMS_FS_LICENSE_SHA256 }}
+          APPROVED_NOTICE_SHA256: ${{ vars.GAMS_FS_NOTICE_SHA256 }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = kkgams/plugin.fs
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            test "$GITHUB_REF" = "refs/tags/v${VERSION}"
+          else
+            test "$GITHUB_EVENT_NAME" = workflow_dispatch
+            test "$GITHUB_REF_TYPE" = branch
+          fi
+          test "$(head -n 1 src/wit/package.wit)" = "package gams:fs@${WIT_VERSION};"
+          test "$APPROVED" = true || { echo 'Release blocked: GAMS_FS_RELEASE_APPROVED must be exactly true.' >&2; exit 1; }
+          for file in LICENSE NOTICE; do
+            test -s "$file" || { echo "Release blocked: missing or empty $file" >&2; exit 1; }
+          done
+          for digest in "$APPROVED_LICENSE_SHA256" "$APPROVED_NOTICE_SHA256"; do
+            [[ "$digest" =~ ^[0-9a-f]{64}$ ]] || { echo 'Release blocked: both approved digests must be lowercase SHA-256.' >&2; exit 1; }
+          done
+          test "$(sha256sum LICENSE | cut -d ' ' -f 1)" = "$APPROVED_LICENSE_SHA256" || { echo 'Release blocked: LICENSE digest mismatch.' >&2; exit 1; }
+          test "$(sha256sum NOTICE | cut -d ' ' -f 1)" = "$APPROVED_NOTICE_SHA256" || { echo 'Release blocked: NOTICE digest mismatch.' >&2; exit 1; }
+      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22 (Node 24)
+      - name: Test release safety scripts
+        run: |
+          bash scripts/test-release-oci-preflight.sh
+          bash scripts/test-release-absent.sh
+          bash scripts/test-artifact-approval.sh
+      - name: Independently test and build
+        run: nix develop --command make test
+      - name: Validate raw WASM notice embedding (publication blocker until tooling exists)
+        run: |
+          set -euo pipefail
+          nix develop --command wasm-tools validate dist/plugin.fs.wasm
+          test -s dist/plugin.fs.wasm
+          python3 scripts/wasm-notices.py verify dist/plugin.fs.wasm --license LICENSE --notice NOTICE
+          cp LICENSE NOTICE dist/
+          (cd dist && sha256sum plugin.fs.wasm LICENSE NOTICE > SHA256SUMS && sha256sum --check SHA256SUMS)
+      - name: Upload gated tag candidate (not itself a release)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0 (Node 24)
+        with:
+          name: plugin-fs-release-${{ github.sha }}
+          path: |
+            dist/plugin.fs.wasm
+            dist/LICENSE
+            dist/NOTICE
+            dist/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0 (Node 24)
+      - name: Recheck tag and owner approval
+        shell: bash
+        env:
+          APPROVED: ${{ vars.GAMS_FS_RELEASE_APPROVED }}
+          APPROVED_LICENSE_SHA256: ${{ vars.GAMS_FS_LICENSE_SHA256 }}
+          APPROVED_NOTICE_SHA256: ${{ vars.GAMS_FS_NOTICE_SHA256 }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = kkgams/plugin.fs
+          test "$GITHUB_REF" = "refs/tags/v${VERSION}"
+          test "$APPROVED" = true
+          test -s LICENSE && test -s NOTICE
+          [[ "$APPROVED_LICENSE_SHA256" =~ ^[0-9a-f]{64}$ ]]
+          [[ "$APPROVED_NOTICE_SHA256" =~ ^[0-9a-f]{64}$ ]]
+          test "$(sha256sum LICENSE | cut -d ' ' -f 1)" = "$APPROVED_LICENSE_SHA256"
+          test "$(sha256sum NOTICE | cut -d ' ' -f 1)" = "$APPROVED_NOTICE_SHA256"
+      - name: Download candidate from this run
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0 (Node 24; upstream action.yml verified)
+        with:
+          name: plugin-fs-release-${{ github.sha }}
+          path: dist
+      - name: Recheck downloaded bytes and embedded notices
+        shell: bash
+        env:
+          APPROVED: ${{ vars.GAMS_FS_RELEASE_APPROVED }}
+          APPROVED_LICENSE_SHA256: ${{ vars.GAMS_FS_LICENSE_SHA256 }}
+          APPROVED_NOTICE_SHA256: ${{ vars.GAMS_FS_NOTICE_SHA256 }}
+        run: |
+          set -euo pipefail
+          (cd dist && sha256sum --check SHA256SUMS)
+          python3 scripts/wasm-notices.py verify dist/plugin.fs.wasm --license LICENSE --notice NOTICE
+          bash scripts/check-artifact-approval.sh
+      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22 (Node 24)
+      - name: Refuse an existing GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/check-release-absent.sh
+      - name: Authenticate wkg via Docker credential store
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "$GITHUB_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+      - name: GHCR exact-version preflight
+        id: oci_preflight
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: nix develop .#release --command bash scripts/release-oci-preflight.sh "$OCI_REF" dist/plugin.fs.wasm
+      - name: Push exact version only if absent
+        if: steps.oci_preflight.outputs.should_push == 'true'
+        run: nix develop .#release --command wkg oci push "$OCI_REF" dist/plugin.fs.wasm
+      - name: Create checksummed GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          printf 'plugin.fs pilot distribution %s exposes WIT gams:fs@%s.\n\nRaw WASM: %s. LICENSE and NOTICE are embedded in the WASM and attached as separate checksummed assets.\n' \
+            "$VERSION" "$WIT_VERSION" "$OCI_REF" > release-notes.md
+          gh release create "$GITHUB_REF_NAME" --verify-tag --latest=false \
+            --title "plugin.fs ${VERSION}" --notes-file release-notes.md \
+            dist/plugin.fs.wasm dist/LICENSE dist/NOTICE dist/SHA256SUMS

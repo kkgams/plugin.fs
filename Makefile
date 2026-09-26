@@ -20,6 +20,8 @@ WIT_SOURCES := $(filter %.wit,$(SOURCE_FILES))
 GEN_DIR := $(BUILD_DIR)/bindings
 ODIN_OBJ := $(BUILD_DIR)/core.o.wasm
 UNSTRIPPED := $(BUILD_DIR)/$(REPOSITORY).unstripped.wasm
+STRIPPED := $(BUILD_DIR)/$(REPOSITORY).stripped.wasm
+NOTICE_MANIFEST := $(BUILD_DIR)/notices.manifest
 COMPONENT := $(DIST_DIR)/$(REPOSITORY).wasm
 TRANSPILED := $(BUILD_DIR)/jco/$(REPOSITORY).js
 
@@ -41,7 +43,7 @@ COMPONENT_SOURCES := src/component.c $(CORE_OBJECT)
 COMPONENT_CFLAGS :=
 endif
 
-.PHONY: all build test clean check-tools
+.PHONY: all build test clean check-tools FORCE
 all: build
 build: $(COMPONENT)
 
@@ -67,8 +69,19 @@ $(UNSTRIPPED): $(SOURCE_FILES) $(CORE_OBJECT) config.mk Makefile
 		"$(GEN_DIR)/$(COMPONENT_NAME).c" $(COMPONENT_SOURCES) \
 		"$(GEN_DIR)/$(COMPONENT_NAME)_component_type.o" -Wl,--strip-all
 
-$(COMPONENT): $(UNSTRIPPED) | $(DIST_DIR)
+$(STRIPPED): $(UNSTRIPPED)
 	@$(WASM_TOOLS) strip -a "$<" -o "$@"
+
+# Track exact licensing bytes, including changes to either file.
+FORCE:
+$(NOTICE_MANIFEST): FORCE
+	@mkdir -p "$(dir $@)"
+	@{ sha256sum LICENSE NOTICE; } > "$@.tmp"
+	@if [ -f "$@" ] && cmp -s "$@.tmp" "$@"; then rm "$@.tmp"; else mv "$@.tmp" "$@"; fi
+
+$(COMPONENT): $(STRIPPED) $(NOTICE_MANIFEST) scripts/wasm-notices.py | $(DIST_DIR)
+	@python3 scripts/wasm-notices.py embed "$<" --license LICENSE --notice NOTICE --output "$@"
+	@python3 scripts/wasm-notices.py verify "$@" --license LICENSE --notice NOTICE
 
 node_modules/.package-lock.json: package.json package-lock.json
 	@$(NPM) ci
@@ -78,7 +91,9 @@ $(TRANSPILED): $(COMPONENT) node_modules/.package-lock.json
 	@./node_modules/.bin/jco transpile "$<" -o "$(BUILD_DIR)/jco" --name "$(REPOSITORY)"
 
 test: check-tools $(TEST_ARTIFACT)
+	@python3 test/test_wasm_notices.py
 	@$(WASM_TOOLS) validate "$(COMPONENT)"
+	@python3 scripts/wasm-notices.py verify "$(COMPONENT)" --license LICENSE --notice NOTICE
 	@$(NODE) "$(TEST_SCRIPT)"
 
 clean:
