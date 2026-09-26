@@ -10,7 +10,8 @@ and, after the CLA attribution update,
 - `nix develop 'path:$PWD#release' --command wkg --version`: pinned wkg 0.15.0;
 - mocked GHCR and GitHub Release preflight tests, plus licensing approval tests
   including rejection of altered texts and a correctly checksummed raw WASM
-  whose notices had been stripped;
+  whose notices had been stripped; `stage-ci-artifact.sh` also staged the
+  actual locally built WASM with exact pinned licensing digests;
 - isolated `actionlint` for verify/release workflows; npm audit: zero findings.
 
 This is **not** evidence of a Linux release-runner build or GHCR publication.

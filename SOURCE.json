@@ -1,23 +1,23 @@
 {
   "source_repository": "https://github.com/justgook/gamectl",
-  "source_base_revision": "630dcf59540740b7c6edd9adf3a6d0e16a715316",
+  "source_base_revision": "6f426ff22590f4e1f046d5c9b732e91ae6b3f8ff",
   "snapshot_kind": "working-tree source snapshot; no history rewritten",
   "source_worktree_status": [],
   "repository": "plugin.fs",
   "files_sha256": {
     ".github/workflows/release.yml": "6a2a739bfe3b4f778a70328d054a56b6390b61b025a8fb8ee01dc9105bd04990",
-    ".github/workflows/verify.yml": "8300975b022e9960e4c3bc6f61df842a86a0af8d80727d03be613f87a97d78df",
+    ".github/workflows/verify.yml": "c5ef766bdf7f55f9e4fd3fef175c208e79e1a112bdfacb9bcbb55f8c1a89baca",
     ".gitignore": "f187168333d7fc1a23e7b90bc248efbf6088571f3d4073f458768182ab8715c5",
-    "BUILD-RESULTS.md": "c72c29a7745ca965672199c1368f456657259ffade7494de77f9f66a59642b10",
+    "BUILD-RESULTS.md": "0f02dcc207334c61304d7323db5804eb4224b54b3978fc3616ccc0eed7754321",
     "CONTEXT.md": "d0f3008be93fbf31345377c7bfa25cdb6baa671353269db5fb7dd6fa051b6454",
     "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
-    "LICENSING.md": "c29ca4f9b28093125c59f225e71aeb4d4acfddf44f58a0e682030e7eb4bed3cd",
+    "LICENSING.md": "52206cc1abb6cc731c27f825c487f3193731a63be75b05edbbde7f3f2c2b1503",
     "Makefile": "ff80fd728ee2391295158e4e4fad00b70b7bb716c1a13991b69c49f49945c76c",
     "NOTICE": "2d3ac85f8a3df5ff3a0e6e6c7da706d0ff4f18697fa68dc4a0b3ceaf3e05203c",
     "PREPARATION.md": "56c3a274b67b6ac57421a61311bd2efc924f71762b19f01131fbd1b38e6b8402",
-    "PUBLISHING.md": "f3d764bd161b5d4307d64fa64024fb91ae079e64a6de883efc8e2738df99ffee",
-    "README.md": "f219a0d889da99d24b6f20e5d99957aec84a7dd3be7ab0081b7e354a95226ca4",
-    "RELEASE-CHECKLIST.md": "663c610756886681a060486b8a9896e5bc694cdd6c1b3728131c3691b8069f7b",
+    "PUBLISHING.md": "c9e859d85d3b865278bc64376e2ed5f25c89bfc5c2c2fcd1c8d4827f80345bf5",
+    "README.md": "5342d6fce3cc413122284328512aed4ade6f64cab28f32df6610f6fa92c1cd96",
+    "RELEASE-CHECKLIST.md": "ead701be9c07263dd9a2ebebc03bdc88230403ecf3e825176305f4d086950e2f",
     "THIRD-PARTY-REVIEW.md": "f2ada8e1792687c983b01854d0d9530beb0b79dce9ddce23a8553a1e6aea3504",
     "config.mk": "b4679cce36ba083744bcede90fa981cc37d9a0f79f4e254f1e05976ac1c8cf3c",
     "flake.lock": "f4eeef56deb209afbca6947807cf700129c325ac9f6eb014ae44b0981b9238e2",
@@ -38,6 +38,8 @@
     "src/wit/deps/wasi-io-0.2.0/package.wit": "0570025e5d4649cc6f4726554c585857cf48fc6df4bf28a7605f4e6f7c82f77a",
     "src/wit/package.wit": "8d31a50c02ae2fa922d885395c7075be7f13c418488d0199685648d8c80e08b2",
     "test/e2e.mjs": "51f2ecc4c21d7595617bfca80a467975f6c3129fb84e363782a2ff120ffb5cf7",
-    "test/test_wasm_notices.py": "511a086b2e676e58272035276d285df8e77587905d6f2a739547294147d7c783"
+    "test/test_wasm_notices.py": "511a086b2e676e58272035276d285df8e77587905d6f2a739547294147d7c783",
+    "scripts/stage-ci-artifact.sh": "0818583d8924914ae95d6837f8bec67acfe774d85078122a0dcc7d35576afe13",
+    "scripts/test-ci-artifact.sh": "49531af19b8aa490fffba680f64b90c11ba9a47f31ab9c083f7c4b8ceffc6ef8"
   }
 }

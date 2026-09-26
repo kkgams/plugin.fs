@@ -15,8 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0 (Node 24)
       - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22 (Node 24)
-      - name: Test candidate and release safety gates without credentials
+      - name: Test public artifact and release safety gates without credentials
         run: |
+          bash scripts/test-ci-artifact.sh
           bash scripts/test-artifact-approval.sh
           bash scripts/test-release-oci-preflight.sh
           bash scripts/test-release-absent.sh
@@ -30,18 +31,13 @@ jobs:
           python3 scripts/wasm-notices.py verify dist/plugin.fs.wasm --license LICENSE --notice NOTICE
           test -s dist/plugin.fs.wasm
           (cd dist && sha256sum plugin.fs.wasm > SHA256SUMS && sha256sum --check SHA256SUMS)
-      # Public GitHub Actions artifacts are distribution. Upload only when the
-      # owner enables this separate gate and approves both exact texts.
-      - name: Approve candidate bytes and stage licensing files
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/release' && vars.GAMS_FS_ARTIFACT_UPLOAD_APPROVED == 'true'
-        shell: bash
-        env:
-          APPROVED: ${{ vars.GAMS_FS_ARTIFACT_UPLOAD_APPROVED }}
-          APPROVED_LICENSE_SHA256: ${{ vars.GAMS_FS_LICENSE_SHA256 }}
-          APPROVED_NOTICE_SHA256: ${{ vars.GAMS_FS_NOTICE_SHA256 }}
-        run: bash scripts/check-artifact-approval.sh
+      # The owner explicitly approved distribution of these exact licensing
+      # bytes. Pin both digests in stage-ci-artifact.sh; changed bytes fail.
+      - name: Stage approved source texts and verify final WASM bytes
+        if: github.event_name == 'push' && github.ref == 'refs/heads/release'
+        run: bash scripts/stage-ci-artifact.sh
       - name: Upload reviewed CI candidate (not a release)
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/release' && vars.GAMS_FS_ARTIFACT_UPLOAD_APPROVED == 'true'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/release'
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0 (Node 24)
         with:
           name: plugin-fs-ci-${{ github.sha }}
