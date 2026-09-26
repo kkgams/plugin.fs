@@ -5,13 +5,13 @@
   "source_worktree_status": [],
   "repository": "plugin.fs",
   "files_sha256": {
-    ".github/workflows/verify.yml": "391a2b65dd89044159fbe526629b03a04b04326b7e399058ce8dce1720dcbacc",
+    ".github/workflows/verify.yml": "6320750ff39f1c4cee7581028ec3af7fa52927b224bb8eb907ee91ba5b317137",
     ".gitignore": "12be7d69664589a1ea44ea4f46b2ea1924d33dac8c474a4f7d2778a8ee9201ea",
     "CONTEXT.md": "d0f3008be93fbf31345377c7bfa25cdb6baa671353269db5fb7dd6fa051b6454",
     "LICENSING.md": "d4b79d8b9ed3c42813d51368fef1ce1f441948b217977ab839e10b23b0262318",
     "Makefile": "28a29e84465a5b6b812e1e7f31169d018b395b3365604fb5cb18072616a9e0e7",
     "PREPARATION.md": "56c3a274b67b6ac57421a61311bd2efc924f71762b19f01131fbd1b38e6b8402",
-    "README.md": "388583e52337bdfde22088539a371dcddf7b99a65588f33422fb992648f82ceb",
+    "README.md": "dab67499f8399986ea2f872d739532001094139fd455393957348d3a2a6fdcbf",
     "config.mk": "b4679cce36ba083744bcede90fa981cc37d9a0f79f4e254f1e05976ac1c8cf3c",
     "flake.lock": "3adbe3447e662145dd50a383489f62e7bfbe16996281e113b1fbac347eca3eae",
     "flake.nix": "e328a1bede7724d259433fa00dca985af8ad01e5a6be27e716b87f0d61467173",
@@ -23,6 +23,8 @@
     "src/wit/deps/wasi-filesystem-0.2.0/package.wit": "fdba56d19f54ceaaf67ea20ad2a6c875539f78066174d01e643153fe16c74d6d",
     "src/wit/deps/wasi-io-0.2.0/package.wit": "0570025e5d4649cc6f4726554c585857cf48fc6df4bf28a7605f4e6f7c82f77a",
     "src/wit/package.wit": "8d31a50c02ae2fa922d885395c7075be7f13c418488d0199685648d8c80e08b2",
-    "test/e2e.mjs": "51f2ecc4c21d7595617bfca80a467975f6c3129fb84e363782a2ff120ffb5cf7"
+    "test/e2e.mjs": "51f2ecc4c21d7595617bfca80a467975f6c3129fb84e363782a2ff120ffb5cf7",
+    "scripts/check-artifact-approval.sh": "d00e4f6febbd210d52c71c2a1b0e75482094b883da312c6ae0ae3d7b62a75b76",
+    "scripts/test-artifact-approval.sh": "5335a91b1a8b5dcb1c8bbe5bb7745622332a0a760b860f83fe8d247782d7e2fe"
   }
 }

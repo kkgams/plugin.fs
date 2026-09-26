@@ -1,4 +1,4 @@
-name: Verify component
+name: Verify and stage component
 
 on:
   pull_request:
@@ -10,14 +10,41 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: DeterminateSystems/nix-installer-action@c5a866b6ab867e88becbed4467b93592bce69f8a # v21
-      - name: Verify licensing gate remains explicit
-        run: test -s LICENSING.md && test ! -e LICENSE
-      - name: Build and test independently
+      - name: Test candidate distribution approval gate
+        run: bash scripts/test-artifact-approval.sh
+      - name: Independently build and test
         run: nix develop --command make test
-      - name: Validate artifact
-        run: nix develop --command wasm-tools validate dist/*.wasm
+      - name: Validate exact component and checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          nix develop --command wasm-tools validate dist/plugin.fs.wasm
+          test -s dist/plugin.fs.wasm
+          (cd dist && sha256sum plugin.fs.wasm > SHA256SUMS && sha256sum --check SHA256SUMS)
+      # Public GitHub Actions artifacts are distribution. Never upload a WASM
+      # from this unlicensed snapshot; approving both exact texts is required.
+      - name: Approve candidate bytes and stage licensing files
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/release' && vars.GAMS_FS_ARTIFACT_UPLOAD_APPROVED == 'true'
+        shell: bash
+        env:
+          APPROVED: ${{ vars.GAMS_FS_ARTIFACT_UPLOAD_APPROVED }}
+          APPROVED_LICENSE_SHA256: ${{ vars.GAMS_FS_LICENSE_SHA256 }}
+          APPROVED_NOTICE_SHA256: ${{ vars.GAMS_FS_NOTICE_SHA256 }}
+        run: bash scripts/check-artifact-approval.sh
+      - name: Upload reviewed CI candidate (not a release)
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/release' && vars.GAMS_FS_ARTIFACT_UPLOAD_APPROVED == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: plugin-fs-ci-${{ github.sha }}
+          path: |
+            dist/plugin.fs.wasm
+            dist/LICENSE
+            dist/NOTICE
+            dist/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 7

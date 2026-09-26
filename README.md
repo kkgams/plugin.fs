@@ -13,5 +13,13 @@ The test transpiles the component with jco and exercises create, text/binary
 read/write, list, stat, rename, and removal in a disposable directory. Build
 output is `dist/plugin.fs.wasm` and is ignored by Git.
 
-This repository has no release/publish automation. See `LICENSING.md` and
+The `release` branch CI builds, tests, validates, and checksums `dist/plugin.fs.wasm`.
+It does **not** upload the binary while licensing remains unresolved. The optional
+short-lived CI candidate upload requires root `LICENSE` and `NOTICE`, both matching
+owner-approved repository variables `GAMS_FS_LICENSE_SHA256` and
+`GAMS_FS_NOTICE_SHA256`, and `GAMS_FS_ARTIFACT_UPLOAD_APPROVED=true`.
+Do not set these until the owner approves the exact text and artifact notice
+packaging after a complete linked-code/third-party review.
+A CI artifact is downloadable distribution, **not** a GitHub Release or GHCR
+package. No tag/release/publish automation exists. See `LICENSING.md` and
 `PREPARATION.md` before considering distribution.
