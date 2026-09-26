@@ -142,6 +142,9 @@
             };
             cargoBuildFlags = [ "-p" "wkg" ];
             cargoTestFlags = [ "-p" "wkg" "--no-default-features" ];
+            # wkg's e2e::check calls the public WIT registry. Nix's sandbox
+            # has no network; keep all its other offline Rust tests enabled.
+            checkFlags = [ "--skip=check" ];
           };
           wasi-sdk = pkgs.stdenvNoCC.mkDerivation (linuxPatching // {
             pname = "wasi-sdk";

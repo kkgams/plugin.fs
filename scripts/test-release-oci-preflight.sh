@@ -64,7 +64,7 @@ case "$url" in
       *) printf 200 ;;
     esac
     ;;
-  https://ghcr.io/v2/kkgams/gams/fs/manifests/0.1.0)
+  https://ghcr.io/v2/kkgams/gams/fs/manifests/0.1.1)
     [[ "$authorization" == 'Authorization: Bearer read-only-token' ]] || {
       echo 'manifest lookup did not use the challenge token' >&2
       exit 97
@@ -90,7 +90,7 @@ MOCK
 cat > "$tmp/wkg" <<'MOCK'
 #!/usr/bin/env bash
 set -euo pipefail
-[[ "$1 $2 $3" == 'oci pull ghcr.io/kkgams/gams/fs:0.1.0' ]]
+[[ "$1 $2 $3" == 'oci pull ghcr.io/kkgams/gams/fs:0.1.1' ]]
 [[ "$4" == -o ]]
 if [[ "$MOCK_SCENARIO" == identical ]]; then
   cp "$EXPECTED_ARTIFACT" "$5"
@@ -111,7 +111,7 @@ run_success() {
   GITHUB_ACTOR=release-bot \
   GITHUB_TOKEN=test-token \
   GITHUB_OUTPUT="$output" \
-    "$subject" ghcr.io/kkgams/gams/fs:0.1.0 "$tmp/artifact.wasm"
+    "$subject" ghcr.io/kkgams/gams/fs:0.1.1 "$tmp/artifact.wasm"
   grep -Fx "$expected" "$output" >/dev/null
 }
 
@@ -124,7 +124,7 @@ run_failure() {
     WKG_BIN="$tmp/wkg" \
     GITHUB_ACTOR=release-bot \
     GITHUB_TOKEN=test-token \
-      "$subject" ghcr.io/kkgams/gams/fs:0.1.0 "$tmp/artifact.wasm" 2> "$stderr"; then
+      "$subject" ghcr.io/kkgams/gams/fs:0.1.1 "$tmp/artifact.wasm" 2> "$stderr"; then
     echo "scenario unexpectedly succeeded: $scenario" >&2
     exit 1
   fi

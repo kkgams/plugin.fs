@@ -13,10 +13,10 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # Pilot coordinates are proposals; change deliberately for a later release.
-  VERSION: '0.1.0'
+  # v0.1.0 failed in the sandboxed wkg test before GHCR publication.
+  VERSION: '0.1.1'
   WIT_VERSION: '1.2.0'
-  OCI_REF: ghcr.io/kkgams/gams/fs:0.1.0
+  OCI_REF: ghcr.io/kkgams/gams/fs:0.1.1
 
 jobs:
   verify:
@@ -66,6 +66,8 @@ jobs:
           python3 scripts/wasm-notices.py verify dist/plugin.fs.wasm --license LICENSE --notice NOTICE
           cp LICENSE NOTICE dist/
           (cd dist && sha256sum plugin.fs.wasm LICENSE NOTICE > SHA256SUMS && sha256sum --check SHA256SUMS)
+      - name: Verify Linux release shell and pinned wkg before tag publication
+        run: nix develop .#release --command wkg --version
       - name: Upload gated tag candidate (not itself a release)
         if: startsWith(github.ref, 'refs/tags/v')
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0 (Node 24)

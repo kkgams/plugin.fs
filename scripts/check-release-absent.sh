@@ -5,7 +5,7 @@ set -euo pipefail
 : "${GITHUB_REPOSITORY:?required}"
 : "${GITHUB_REF_NAME:?required}"
 [[ "$GITHUB_REPOSITORY" == 'kkgams/plugin.fs' ]] || { echo 'Unexpected repository' >&2; exit 1; }
-[[ "$GITHUB_REF_NAME" == 'v0.1.0' ]] || { echo 'Unexpected tag' >&2; exit 1; }
+[[ "$GITHUB_REF_NAME" == 'v0.1.1' ]] || { echo 'Unexpected tag' >&2; exit 1; }
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 if ! status="$("${CURL_BIN:-curl}" --silent --show-error --output "$work/release.json" --write-out '%{http_code}' \

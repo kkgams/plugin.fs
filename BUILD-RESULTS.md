@@ -14,7 +14,16 @@ and, after the CLA attribution update,
   actual locally built WASM with exact pinned licensing digests;
 - isolated `actionlint` for verify/release workflows; npm audit: zero findings.
 
-This is **not** evidence of a Linux release-runner build or GHCR publication.
+The first `v0.1.0` tag-run reached the GHCR preflight step, but Linux Nix
+building `wkg` failed **before any registry push**: upstream `crates/wkg/tests/e2e.rs`
+`check` calls a public registry, while the Nix sandbox has no DNS/CA access.
+The release shell now skips only that network-dependent test; its offline
+Rust tests remain enabled. On Darwin arm64, Nix rebuilt the modified `wkg`
+derivation successfully (`1 passed`, `1 filtered out`) and `wkg --version`
+reported `0.15.0`; Linux evaluation confirms the same `checkFlags` and
+`doCheck=1`. Hosted Linux confirmation of the corrected derivation is still
+required. Neither the failed tag-run nor this local retest proves GHCR
+publication or a GitHub Release.
 The proposed Apache license digest and full NOTICE are owner-review inputs, not
 owner approval. WASI WIT source and W3C CLA conditions have since been
 identified and `NOTICE` revised; see `THIRD-PARTY-REVIEW.md`. The updated
