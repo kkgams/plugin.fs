@@ -13,8 +13,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: DeterminateSystems/nix-installer-action@c5a866b6ab867e88becbed4467b93592bce69f8a # v21
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0 (Node 24)
+      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22 (Node 24)
       - name: Test candidate distribution approval gate
         run: bash scripts/test-artifact-approval.sh
       - name: Independently build and test
@@ -38,7 +38,7 @@ jobs:
         run: bash scripts/check-artifact-approval.sh
       - name: Upload reviewed CI candidate (not a release)
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/release' && vars.GAMS_FS_ARTIFACT_UPLOAD_APPROVED == 'true'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0 (Node 24)
         with:
           name: plugin-fs-ci-${{ github.sha }}
           path: |

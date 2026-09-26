@@ -5,7 +5,7 @@
   "source_worktree_status": [],
   "repository": "plugin.fs",
   "files_sha256": {
-    ".github/workflows/verify.yml": "6320750ff39f1c4cee7581028ec3af7fa52927b224bb8eb907ee91ba5b317137",
+    ".github/workflows/verify.yml": "7f970b8309a14be4a570757b2ec9160257883dec453247a9e5fcf94f56b498c7",
     ".gitignore": "12be7d69664589a1ea44ea4f46b2ea1924d33dac8c474a4f7d2778a8ee9201ea",
     "CONTEXT.md": "d0f3008be93fbf31345377c7bfa25cdb6baa671353269db5fb7dd6fa051b6454",
     "LICENSING.md": "d4b79d8b9ed3c42813d51368fef1ce1f441948b217977ab839e10b23b0262318",
