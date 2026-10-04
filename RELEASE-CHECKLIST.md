@@ -1,3 +1,14 @@
+> **Prospective v0.2.0 maintenance preparation — NOT release-ready.**
+> Target: `plugin.fs` v0.2.0, `plugin.fs.wasm`, `ghcr.io/kkgams/gams/fs:0.2.0`.
+> Below is frozen historical documentation: existing GitHub Release URLs,
+> versioned examples and repair instructions refer to their original releases.
+> For a future v0.2.0 candidate, use the prepared distribution metadata;
+> rebuild and run repository-owned locked toolchain/runtime tests, review
+> source drift, linked evidence and exact LICENSE/NOTICE/candidate digests.
+> Migrate the direct-release publisher to draft-first immutable-policy and
+> exact public-byte verification before any tag/OCI push/Pages publication.
+> Do not run the historical publishing commands as v0.2.0 instructions.
+
 # plugin.fs pilot release checklist
 
 The owner authorized the `plugin.fs` publishing pilot and accepted responsibility for the licensing decision. The `v0.1.0` tag run failed during Nix's `wkg` build, before GHCR push; **do not move/reuse that tag**. Retry Distribution Version `0.1.1`, WIT `gams:fs@1.2.0`, repo `kkgams/plugin.fs`, raw GHCR `ghcr.io/kkgams/gams/fs:0.1.1`. No approval variables or releases have been created by the assistant.

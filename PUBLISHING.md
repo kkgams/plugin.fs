@@ -1,3 +1,14 @@
+> **Prospective v0.2.0 maintenance preparation — NOT release-ready.**
+> Target: `plugin.fs` v0.2.0, `plugin.fs.wasm`, `ghcr.io/kkgams/gams/fs:0.2.0`.
+> Below is frozen historical documentation: existing GitHub Release URLs,
+> versioned examples and repair instructions refer to their original releases.
+> For a future v0.2.0 candidate, use the prepared distribution metadata;
+> rebuild and run repository-owned locked toolchain/runtime tests, review
+> source drift, linked evidence and exact LICENSE/NOTICE/candidate digests.
+> Migrate the direct-release publisher to draft-first immutable-policy and
+> exact public-byte verification before any tag/OCI push/Pages publication.
+> Do not run the historical publishing commands as v0.2.0 instructions.
+
 # plugin.fs pilot publishing
 
 The owner authorized **public CI artifact distribution** of the current exact Apache-2.0/WASI WIT notice bytes and accepted responsibility for the licensing decision. This scaffold targets the standalone **`kkgams/plugin.fs`** repository. No approval variables or publication have been created by the assistant. The retry Distribution Version is **`0.1.1`** (tag `v0.1.1`), separate from WIT **`gams:fs@1.2.0`** (export `gams:fs/fs@1.2.0`). The proposed raw component location is **`ghcr.io/kkgams/gams/fs:0.1.1`**; no mutable `latest` tag is pushed. The GitHub Release would attach `plugin.fs.wasm`, `LICENSE`, `NOTICE`, and `SHA256SUMS` covering all three payload files.

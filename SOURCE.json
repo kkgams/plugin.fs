@@ -1,9 +1,4 @@
 {
-  "source_repository": "https://github.com/justgook/gamectl",
-  "source_base_revision": "6625b8d0d9b54e164623024992b71d497b6f9213",
-  "snapshot_kind": "working-tree source snapshot; no history rewritten",
-  "source_worktree_status": [],
-  "repository": "plugin.fs",
   "files_sha256": {
     ".github/workflows/release.yml": "f2da616a47bd9b6106aed2a2df91001d99090523072ea967d22cadf70eaa1153",
     ".github/workflows/verify.yml": "c5ef766bdf7f55f9e4fd3fef175c208e79e1a112bdfacb9bcbb55f8c1a89baca",
@@ -27,7 +22,9 @@
     "scripts/check-artifact-approval.sh": "99cf76bdc5ca6344a2d560bb5e7ec0cea02a6f21ceb91a6a61f3247d0935ee51",
     "scripts/check-release-absent.sh": "273217a96a0a3316ced4d969609c89a139e085edde0f31370ce2fd6493e45fea",
     "scripts/release-oci-preflight.sh": "38f265a1d111a8ca3bbd1db93fdd9c956d4b6a5dea9c88cd3f7be1a68b120d1f",
+    "scripts/stage-ci-artifact.sh": "0818583d8924914ae95d6837f8bec67acfe774d85078122a0dcc7d35576afe13",
     "scripts/test-artifact-approval.sh": "23c80550f8375042a4f0d7426544666cbce8e4f0c0591efbd7f9c1f1365fc33c",
+    "scripts/test-ci-artifact.sh": "49531af19b8aa490fffba680f64b90c11ba9a47f31ab9c083f7c4b8ceffc6ef8",
     "scripts/test-release-absent.sh": "371cd937fba9de2f5ec0bfb9e03aa4119a60d151a8f74a0e6c8e9c1da7621b03",
     "scripts/test-release-oci-preflight.sh": "c7cbbf3f1044b4228be2542df33946a7884b6f4918c0ee84f55649362d2c6915",
     "scripts/wasm-notices.py": "91d94800f753ae948e9289393da9b6b63f6dc24e154a41fbdae2fd59f9305d85",
@@ -38,8 +35,152 @@
     "src/wit/deps/wasi-io-0.2.0/package.wit": "0570025e5d4649cc6f4726554c585857cf48fc6df4bf28a7605f4e6f7c82f77a",
     "src/wit/package.wit": "8d31a50c02ae2fa922d885395c7075be7f13c418488d0199685648d8c80e08b2",
     "test/e2e.mjs": "51f2ecc4c21d7595617bfca80a467975f6c3129fb84e363782a2ff120ffb5cf7",
-    "test/test_wasm_notices.py": "511a086b2e676e58272035276d285df8e77587905d6f2a739547294147d7c783",
-    "scripts/stage-ci-artifact.sh": "0818583d8924914ae95d6837f8bec67acfe774d85078122a0dcc7d35576afe13",
-    "scripts/test-ci-artifact.sh": "49531af19b8aa490fffba680f64b90c11ba9a47f31ab9c083f7c4b8ceffc6ef8"
-  }
+    "test/test_wasm_notices.py": "511a086b2e676e58272035276d285df8e77587905d6f2a739547294147d7c783"
+  },
+  "maintenance": {
+    "baseline_commit": "a73ba44b8923cf6da8baf63bc3a427139c5d35a8",
+    "blockers": [
+      "publication migration required: older direct GitHub Release creation lacks strict immutable-policy/draft/public verification",
+      "owner candidate/digest authorization and final locked builds/runtime/hosted linked-evidence review pending",
+      "historical SOURCE sparse coverage/drift requires provenance review; no complete legal certification",
+      "publisher release-HEAD equality/manual-branch authorization migration required"
+    ],
+    "changed_inputs": {
+      ".github/workflows/release.yml": {
+        "after": "8f31b9681465f23c5a78fc79752d346732dd4b498ccd6f0099d91188d335a2d3",
+        "before": "f2da616a47bd9b6106aed2a2df91001d99090523072ea967d22cadf70eaa1153",
+        "rule": "FS operative VERSION and OCI_REF only; WIT_VERSION preserved"
+      },
+      "PUBLISHING.md": {
+        "after": "a16c26316ed6b180b08c9eb7809bb1c3e644c9c60ae68278defecc34262db6b9",
+        "before": "8aa083899ffd81863e00a80082ca30e3062f73c8fe7d1091b698f6ebf2a35c2e",
+        "rule": "insert prospective instructions after any frontmatter; entire historical text/URLs retained"
+      },
+      "README.md": {
+        "after": "ed551356b577a58375fbcbfa67596f3558aa24081441d3ea575f988703fc0e58",
+        "before": "5342d6fce3cc413122284328512aed4ade6f64cab28f32df6610f6fa92c1cd96",
+        "rule": "insert prospective instructions after any frontmatter; entire historical text/URLs retained"
+      },
+      "RELEASE-CHECKLIST.md": {
+        "after": "d8e190adb44af642a32a10125aad0b3079edef89fb25e90786983c8f01c09d09",
+        "before": "947430c14a55a43261f1a89c2900826c7ded07b5218bedadf2200aa57450d696",
+        "rule": "insert prospective instructions after any frontmatter; entire historical text/URLs retained"
+      },
+      "scripts/check-release-absent.sh": {
+        "after": "c7774e51480bd423ae4b7f5c904c69ef4d68e3a12831c0581ca92274c6656d6d",
+        "before": "273217a96a0a3316ced4d969609c89a139e085edde0f31370ce2fd6493e45fea",
+        "rule": "FS fixed absence tag"
+      },
+      "scripts/test-release-absent.sh": {
+        "after": "a338ff9e5d3c11a153b64924ebeec04c956327ea4d10beb37e4469e57187a752",
+        "before": "371cd937fba9de2f5ec0bfb9e03aa4119a60d151a8f74a0e6c8e9c1da7621b03",
+        "rule": "FS matching mock URL and current tag fixture only"
+      }
+    },
+    "existing_license_authority": "requires clarification where contribution/authority bounds are unclear; no existing payload relicensed",
+    "historical_drift": {},
+    "inventory": {
+      "baseline_files_sha256": {
+        ".github/workflows/release.yml": "f2da616a47bd9b6106aed2a2df91001d99090523072ea967d22cadf70eaa1153",
+        ".github/workflows/verify.yml": "c5ef766bdf7f55f9e4fd3fef175c208e79e1a112bdfacb9bcbb55f8c1a89baca",
+        ".gitignore": "f187168333d7fc1a23e7b90bc248efbf6088571f3d4073f458768182ab8715c5",
+        "BUILD-RESULTS.md": "8ed7e424812b769669eac98e4cf8387202ab82a833ebf13950637f95bca154eb",
+        "CONTEXT.md": "d0f3008be93fbf31345377c7bfa25cdb6baa671353269db5fb7dd6fa051b6454",
+        "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "LICENSING.md": "52206cc1abb6cc731c27f825c487f3193731a63be75b05edbbde7f3f2c2b1503",
+        "Makefile": "ff80fd728ee2391295158e4e4fad00b70b7bb716c1a13991b69c49f49945c76c",
+        "NOTICE": "2d3ac85f8a3df5ff3a0e6e6c7da706d0ff4f18697fa68dc4a0b3ceaf3e05203c",
+        "PREPARATION.md": "56c3a274b67b6ac57421a61311bd2efc924f71762b19f01131fbd1b38e6b8402",
+        "PUBLISHING.md": "8aa083899ffd81863e00a80082ca30e3062f73c8fe7d1091b698f6ebf2a35c2e",
+        "README.md": "5342d6fce3cc413122284328512aed4ade6f64cab28f32df6610f6fa92c1cd96",
+        "RELEASE-CHECKLIST.md": "947430c14a55a43261f1a89c2900826c7ded07b5218bedadf2200aa57450d696",
+        "THIRD-PARTY-REVIEW.md": "f2ada8e1792687c983b01854d0d9530beb0b79dce9ddce23a8553a1e6aea3504",
+        "config.mk": "b4679cce36ba083744bcede90fa981cc37d9a0f79f4e254f1e05976ac1c8cf3c",
+        "flake.lock": "f4eeef56deb209afbca6947807cf700129c325ac9f6eb014ae44b0981b9238e2",
+        "flake.nix": "329758de1b14e2b75d7b74d8a28b97538c13d80c2d5003190387f856fb55a896",
+        "package-lock.json": "5240ede684e3033df4c6231ec9bbff02e2ca6e1d4c49052d2324882d3c0fd148",
+        "package.json": "d4118331ab46e0bd98d736e2fb45fdd693613b22b5f9644373ccb98f52a43bff",
+        "scripts/check-artifact-approval.sh": "99cf76bdc5ca6344a2d560bb5e7ec0cea02a6f21ceb91a6a61f3247d0935ee51",
+        "scripts/check-release-absent.sh": "273217a96a0a3316ced4d969609c89a139e085edde0f31370ce2fd6493e45fea",
+        "scripts/release-oci-preflight.sh": "38f265a1d111a8ca3bbd1db93fdd9c956d4b6a5dea9c88cd3f7be1a68b120d1f",
+        "scripts/stage-ci-artifact.sh": "0818583d8924914ae95d6837f8bec67acfe774d85078122a0dcc7d35576afe13",
+        "scripts/test-artifact-approval.sh": "23c80550f8375042a4f0d7426544666cbce8e4f0c0591efbd7f9c1f1365fc33c",
+        "scripts/test-ci-artifact.sh": "49531af19b8aa490fffba680f64b90c11ba9a47f31ab9c083f7c4b8ceffc6ef8",
+        "scripts/test-release-absent.sh": "371cd937fba9de2f5ec0bfb9e03aa4119a60d151a8f74a0e6c8e9c1da7621b03",
+        "scripts/test-release-oci-preflight.sh": "c7cbbf3f1044b4228be2542df33946a7884b6f4918c0ee84f55649362d2c6915",
+        "scripts/wasm-notices.py": "91d94800f753ae948e9289393da9b6b63f6dc24e154a41fbdae2fd59f9305d85",
+        "src/component.c": "3aa0902eab02fe352ce5646d69aad359fa3811ac336a1dbc2f043083942f7786",
+        "src/plugin.mk": "79dd0a3cdba4d525d76edbafe7f00df1be515b462a5df312c8f02bfc26e48e45",
+        "src/wit/deps/wasi-clocks-0.2.0/package.wit": "d4d98af006f1cce3bc8b447975be2c87064b80ba3d87db68a2f46a24e01d7400",
+        "src/wit/deps/wasi-filesystem-0.2.0/package.wit": "fdba56d19f54ceaaf67ea20ad2a6c875539f78066174d01e643153fe16c74d6d",
+        "src/wit/deps/wasi-io-0.2.0/package.wit": "0570025e5d4649cc6f4726554c585857cf48fc6df4bf28a7605f4e6f7c82f77a",
+        "src/wit/package.wit": "8d31a50c02ae2fa922d885395c7075be7f13c418488d0199685648d8c80e08b2",
+        "test/e2e.mjs": "51f2ecc4c21d7595617bfca80a467975f6c3129fb84e363782a2ff120ffb5cf7",
+        "test/test_wasm_notices.py": "511a086b2e676e58272035276d285df8e77587905d6f2a739547294147d7c783"
+      },
+      "exclusions": {
+        ".git": "Git administrative data",
+        "SOURCE.json": "independent self-binding record"
+      },
+      "files_sha256": {
+        ".github/workflows/release.yml": "8f31b9681465f23c5a78fc79752d346732dd4b498ccd6f0099d91188d335a2d3",
+        ".github/workflows/verify.yml": "c5ef766bdf7f55f9e4fd3fef175c208e79e1a112bdfacb9bcbb55f8c1a89baca",
+        ".gitignore": "f187168333d7fc1a23e7b90bc248efbf6088571f3d4073f458768182ab8715c5",
+        "BUILD-RESULTS.md": "8ed7e424812b769669eac98e4cf8387202ab82a833ebf13950637f95bca154eb",
+        "CONTEXT.md": "d0f3008be93fbf31345377c7bfa25cdb6baa671353269db5fb7dd6fa051b6454",
+        "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "LICENSING.md": "52206cc1abb6cc731c27f825c487f3193731a63be75b05edbbde7f3f2c2b1503",
+        "Makefile": "ff80fd728ee2391295158e4e4fad00b70b7bb716c1a13991b69c49f49945c76c",
+        "NOTICE": "2d3ac85f8a3df5ff3a0e6e6c7da706d0ff4f18697fa68dc4a0b3ceaf3e05203c",
+        "PREPARATION.md": "56c3a274b67b6ac57421a61311bd2efc924f71762b19f01131fbd1b38e6b8402",
+        "PUBLISHING.md": "a16c26316ed6b180b08c9eb7809bb1c3e644c9c60ae68278defecc34262db6b9",
+        "README.md": "ed551356b577a58375fbcbfa67596f3558aa24081441d3ea575f988703fc0e58",
+        "RELEASE-CHECKLIST.md": "d8e190adb44af642a32a10125aad0b3079edef89fb25e90786983c8f01c09d09",
+        "THIRD-PARTY-REVIEW.md": "f2ada8e1792687c983b01854d0d9530beb0b79dce9ddce23a8553a1e6aea3504",
+        "config.mk": "b4679cce36ba083744bcede90fa981cc37d9a0f79f4e254f1e05976ac1c8cf3c",
+        "flake.lock": "f4eeef56deb209afbca6947807cf700129c325ac9f6eb014ae44b0981b9238e2",
+        "flake.nix": "329758de1b14e2b75d7b74d8a28b97538c13d80c2d5003190387f856fb55a896",
+        "package-lock.json": "5240ede684e3033df4c6231ec9bbff02e2ca6e1d4c49052d2324882d3c0fd148",
+        "package.json": "d4118331ab46e0bd98d736e2fb45fdd693613b22b5f9644373ccb98f52a43bff",
+        "scripts/check-artifact-approval.sh": "99cf76bdc5ca6344a2d560bb5e7ec0cea02a6f21ceb91a6a61f3247d0935ee51",
+        "scripts/check-release-absent.sh": "c7774e51480bd423ae4b7f5c904c69ef4d68e3a12831c0581ca92274c6656d6d",
+        "scripts/release-oci-preflight.sh": "38f265a1d111a8ca3bbd1db93fdd9c956d4b6a5dea9c88cd3f7be1a68b120d1f",
+        "scripts/stage-ci-artifact.sh": "0818583d8924914ae95d6837f8bec67acfe774d85078122a0dcc7d35576afe13",
+        "scripts/test-artifact-approval.sh": "23c80550f8375042a4f0d7426544666cbce8e4f0c0591efbd7f9c1f1365fc33c",
+        "scripts/test-ci-artifact.sh": "49531af19b8aa490fffba680f64b90c11ba9a47f31ab9c083f7c4b8ceffc6ef8",
+        "scripts/test-release-absent.sh": "a338ff9e5d3c11a153b64924ebeec04c956327ea4d10beb37e4469e57187a752",
+        "scripts/test-release-oci-preflight.sh": "c7cbbf3f1044b4228be2542df33946a7884b6f4918c0ee84f55649362d2c6915",
+        "scripts/wasm-notices.py": "91d94800f753ae948e9289393da9b6b63f6dc24e154a41fbdae2fd59f9305d85",
+        "src/component.c": "3aa0902eab02fe352ce5646d69aad359fa3811ac336a1dbc2f043083942f7786",
+        "src/plugin.mk": "79dd0a3cdba4d525d76edbafe7f00df1be515b462a5df312c8f02bfc26e48e45",
+        "src/wit/deps/wasi-clocks-0.2.0/package.wit": "d4d98af006f1cce3bc8b447975be2c87064b80ba3d87db68a2f46a24e01d7400",
+        "src/wit/deps/wasi-filesystem-0.2.0/package.wit": "fdba56d19f54ceaaf67ea20ad2a6c875539f78066174d01e643153fe16c74d6d",
+        "src/wit/deps/wasi-io-0.2.0/package.wit": "0570025e5d4649cc6f4726554c585857cf48fc6df4bf28a7605f4e6f7c82f77a",
+        "src/wit/package.wit": "8d31a50c02ae2fa922d885395c7075be7f13c418488d0199685648d8c80e08b2",
+        "test/e2e.mjs": "51f2ecc4c21d7595617bfca80a467975f6c3129fb84e363782a2ff120ffb5cf7",
+        "test/test_wasm_notices.py": "511a086b2e676e58272035276d285df8e77587905d6f2a739547294147d7c783"
+      },
+      "scope": "complete prepared source-only clone, not legal or linked-output certification"
+    },
+    "native_evidence": {
+      "binding": "Pinned native inventories do not bind distribution version fields; flake toolchain pins and all linked/source/runtime bytes unchanged.",
+      "reviewed_files_sha256": {
+        "NOTICE": "2d3ac85f8a3df5ff3a0e6e6c7da706d0ff4f18697fa68dc4a0b3ceaf3e05203c",
+        "THIRD-PARTY-REVIEW.md": "f2ada8e1792687c983b01854d0d9530beb0b79dce9ddce23a8553a1e6aea3504"
+      },
+      "status": "historical native evidence preserved; final candidate relink/hosted review pending"
+    },
+    "new_recipe_license": "Apache-2.0",
+    "previous_source_sha256": "07662e06059c607dd76f8b45a41fde4af5d72b4f8e71fc6676744962dce0bedc",
+    "recipe": "packaging/ecosystem/coordinated_release/legacy_components.py:prepare",
+    "recipe_sha256": "7ca563813385652f1ba1a44069eb5d469e8804b8ea7b45295c5b4a2e69e4d5ce",
+    "release_ready": false,
+    "schema": 1,
+    "version": "0.2.0"
+  },
+  "repository": "plugin.fs",
+  "snapshot_kind": "working-tree source snapshot; no history rewritten",
+  "source_base_revision": "6625b8d0d9b54e164623024992b71d497b6f9213",
+  "source_repository": "https://github.com/justgook/gamectl",
+  "source_worktree_status": []
 }
