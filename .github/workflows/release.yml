@@ -14,9 +14,9 @@ concurrency:
 
 env:
   # v0.1.0 failed in the sandboxed wkg test before GHCR publication.
-  VERSION: '0.2.0'
+  VERSION: '0.2.1'
   WIT_VERSION: '1.2.0'
-  OCI_REF: ghcr.io/kkgams/gams/fs:0.2.0
+  OCI_REF: ghcr.io/kkgams/gams/fs:0.2.1
 
 jobs:
   verify:
