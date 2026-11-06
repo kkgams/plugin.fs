@@ -31,12 +31,10 @@ jobs:
           python3 scripts/wasm-notices.py verify dist/plugin.fs.wasm --license LICENSE --notice NOTICE
           test -s dist/plugin.fs.wasm
           (cd dist && sha256sum plugin.fs.wasm > SHA256SUMS && sha256sum --check SHA256SUMS)
-      # The owner explicitly approved distribution of these exact licensing
-      # bytes. Pin both digests in stage-ci-artifact.sh; changed bytes fail.
-      - name: Stage approved source texts and verify final WASM bytes
+      - name: Stage source licensing texts and verify final WASM bytes
         if: github.event_name == 'push' && github.ref == 'refs/heads/release'
         run: bash scripts/stage-ci-artifact.sh
-      - name: Upload reviewed CI candidate (not a release)
+      - name: Upload validated CI candidate (not a release)
         if: github.event_name == 'push' && github.ref == 'refs/heads/release'
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0 (Node 24)
         with:

@@ -6,7 +6,7 @@ trap 'rm -rf "$work"' EXIT
 cd "$work"
 mkdir -p dist scripts
 cp "$source_dir/LICENSE" "$source_dir/NOTICE" .
-cp "$source_dir/scripts/wasm-notices.py" scripts/
+cp "$source_dir/scripts/wasm-notices.py" "$source_dir/scripts/check-artifact-approval.sh" scripts/
 printf '\0asm\r\0\1\0' > dist/plugin.fs.wasm
 python3 scripts/wasm-notices.py embed dist/plugin.fs.wasm --license LICENSE --notice NOTICE
 checksum() { (cd dist && sha256sum plugin.fs.wasm > SHA256SUMS); }
@@ -35,4 +35,4 @@ python3 scripts/wasm-notices.py embed dist/plugin.fs.wasm --license LICENSE --no
 checksum
 bash "$source_dir/scripts/stage-ci-artifact.sh"
 (cd dist && sha256sum --check SHA256SUMS)
-echo 'Approved CI artifact staging tests passed'
+echo 'CI artifact content staging tests passed'
