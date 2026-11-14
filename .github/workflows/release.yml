@@ -1,131 +1,68 @@
-name: Release plugin.fs (pilot)
-
+name: Release component
 on:
   push:
-    tags: ['v*']
-  workflow_dispatch:
-
-permissions:
-  contents: read
-
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
 concurrency:
-  group: fs-release-${{ github.ref }}
+  group: release-${{ github.ref }}
   cancel-in-progress: false
-
-env:
-  # v0.1.0 failed in the sandboxed wkg test before GHCR publication.
-  VERSION: '0.2.1'
-  WIT_VERSION: '1.2.0'
-  OCI_REF: ghcr.io/kkgams/gams/fs:0.2.1
-
+permissions:
+  contents: write
+  packages: write
 jobs:
-  verify:
+  release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0 (Node 24)
-      - name: Gate identity and required licensing texts before build
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$GITHUB_REPOSITORY" = kkgams/plugin.fs
-          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            test "$GITHUB_REF" = "refs/tags/v${VERSION}"
-          else
-            test "$GITHUB_EVENT_NAME" = workflow_dispatch
-            test "$GITHUB_REF_TYPE" = branch
-          fi
-          test "$(head -n 1 src/wit/package.wit)" = "package gams:fs@${WIT_VERSION};"
-          for file in LICENSE NOTICE; do
-            test -s "$file" || { echo "Release blocked: missing or empty $file" >&2; exit 1; }
-          done
-      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22 (Node 24)
-      - name: Test release safety scripts
-        run: |
-          bash scripts/test-release-oci-preflight.sh
-          bash scripts/test-release-absent.sh
-          bash scripts/test-artifact-approval.sh
-      - name: Independently test and build
-        run: nix develop --command make test
-      - name: Validate final raw WASM and embedded notice bytes
-        run: |
-          set -euo pipefail
-          nix develop --command wasm-tools validate dist/plugin.fs.wasm
-          test -s dist/plugin.fs.wasm
-          python3 scripts/wasm-notices.py verify dist/plugin.fs.wasm --license LICENSE --notice NOTICE
-          cp LICENSE NOTICE dist/
-          (cd dist && sha256sum plugin.fs.wasm LICENSE NOTICE > SHA256SUMS && sha256sum --check SHA256SUMS)
-      - name: Verify Linux release shell and pinned wkg before tag publication
-        run: nix develop .#release --command wkg --version
-      - name: Upload gated tag candidate (not itself a release)
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0 (Node 24)
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
-          name: plugin-fs-release-${{ github.sha }}
-          path: |
-            dist/plugin.fs.wasm
-            dist/LICENSE
-            dist/NOTICE
-            dist/SHA256SUMS
-          if-no-files-found: error
-          retention-days: 7
-
-  publish:
-    if: startsWith(github.ref, 'refs/tags/v')
-    needs: verify
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      packages: write
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0 (Node 24)
-      - name: Recheck tag and required licensing texts
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$GITHUB_REPOSITORY" = kkgams/plugin.fs
-          test "$GITHUB_REF" = "refs/tags/v${VERSION}"
-          test -s LICENSE && test -s NOTICE
-      - name: Download candidate from this run
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0 (Node 24; upstream action.yml verified)
-        with:
-          name: plugin-fs-release-${{ github.sha }}
-          path: dist
-      - name: Recheck downloaded bytes and embedded notices
-        shell: bash
-        run: |
-          set -euo pipefail
-          (cd dist && sha256sum --check SHA256SUMS)
-          python3 scripts/wasm-notices.py verify dist/plugin.fs.wasm --license LICENSE --notice NOTICE
-          bash scripts/check-artifact-approval.sh
-      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22 (Node 24)
-      - name: Refuse an existing GitHub Release
+          ref: ${{ github.sha }}
+      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22
+      - name: Package component and notices
+        run: nix develop --command make package
+      - name: Publish raw WASM to OCI without replacing an existing tag
         env:
           GH_TOKEN: ${{ github.token }}
-        run: bash scripts/check-release-absent.sh
-      - name: Authenticate wkg via Docker credential store
+          WKG_OCI_USERNAME: ${{ github.actor }}
+          WKG_OCI_PASSWORD: ${{ github.token }}
         shell: bash
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: echo "$GITHUB_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
-      - name: GHCR exact-version preflight
-        id: oci_preflight
-        shell: bash
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: nix develop .#release --command bash scripts/release-oci-preflight.sh "$OCI_REF" dist/plugin.fs.wasm
-      - name: Push exact version only if absent
-        if: steps.oci_preflight.outputs.should_push == 'true'
-        run: nix develop .#release --command wkg oci push "$OCI_REF" dist/plugin.fs.wasm
-      - name: Create checksummed GitHub Release
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          printf 'plugin.fs pilot distribution %s exposes WIT gams:fs@%s.\n\nRaw WASM: %s. LICENSE and NOTICE are embedded in the WASM and attached as separate checksummed assets.\n' \
-            "$VERSION" "$WIT_VERSION" "$OCI_REF" > release-notes.md
-          gh release create "$GITHUB_REF_NAME" --verify-tag --latest=false \
-            --title "plugin.fs ${VERSION}" --notes-file release-notes.md \
-            dist/plugin.fs.wasm dist/LICENSE dist/NOTICE dist/SHA256SUMS
+          version="${GITHUB_REF_NAME#v}"
+          token=$(curl --fail --silent --show-error --get \
+            --user "${WKG_OCI_USERNAME}:${GH_TOKEN}" \
+            --data-urlencode 'service=ghcr.io' \
+            --data-urlencode 'scope=repository:kkgams/gams/fs:pull,push' \
+            https://ghcr.io/token | python3 -c '
+          import json, sys
+          token = json.load(sys.stdin)["token"]
+          assert isinstance(token, str) and token, "Missing registry token"
+          print(token)')
+          echo "::add-mask::$token"
+          status=$(curl --silent --show-error \
+            --output build.nosync/oci-manifest.json --write-out '%{http_code}' \
+            --header "Authorization: Bearer $token" \
+            --header 'Accept: application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json' \
+            "https://ghcr.io/v2/kkgams/gams/fs/manifests/$version")
+          case "$status" in
+            404)
+              python3 -c '
+          import json
+          with open("build.nosync/oci-manifest.json") as response:
+              errors = json.load(response)["errors"]
+          assert errors and all(error["code"] in ("MANIFEST_UNKNOWN", "NAME_UNKNOWN") for error in errors), "Registry did not confirm manifest absence"'
+              ;;
+            200) echo 'OCI tag already exists; refusing to overwrite it.' >&2; exit 1 ;;
+            *) echo "OCI lookup returned HTTP $status; refusing publication." >&2; exit 1 ;;
+          esac
+          # Concurrency serializes this workflow; external publishers must not use this tag.
+          nix develop .#release --command wkg oci push "ghcr.io/kkgams/gams/fs:$version" build.nosync/plugin.fs.wasm
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            build.nosync/plugin.fs.wasm \
+            build.nosync/LICENSE \
+            build.nosync/NOTICE \
+            build.nosync/SHA256SUMS \
+            --generate-notes --verify-tag

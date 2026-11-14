@@ -1,7 +1,7 @@
 {
   "plugins": [
     "https://github.com/kkgams/plugin.layout/releases/download/v0.2.0/plugin.layout.wasm",
-    "dist/plugin.fs.wasm"
+    "build.nosync/plugin.fs.wasm"
   ],
   "ui": {
     "keys": [],

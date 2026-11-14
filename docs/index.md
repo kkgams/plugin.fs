@@ -1,41 +1,29 @@
 ---
-title: plugin.fs
-description: Local development and Project launch.
+title: Filesystem Proxy
+description: Capability-bound filesystem operations for GAMS.
 status: reference
 ---
+# Filesystem Proxy
 
-# plugin.fs
+The filesystem proxy is a [GAMS](https://github.com/kkgams/gams) WASM Project Unit providing `gams:fs/fs@1.2.0`. It reads/writes text and binary files, lists/stats entries, creates/removes directories, renames and removes files within Host-preopened directories. Filesystem failures return WIT result errors; the plugin cannot broaden its preopened capabilities.
 
-Provides the filesystem proxy `gams:fs/fs@1.2.0`. Read and write text or
-binary files, list directories, inspect file metadata, rename entries and remove
-files within directories preopened by the Host. Plugin paths cannot broaden
-those capabilities; filesystem failures return WIT result errors.
+| Unit | Source / output | Original work |
+| --- | --- | --- |
+| Filesystem proxy | `src/component.c`, `src/wit/package.wit`; `build.nosync/plugin.fs.wasm` | GAMS contributors; WASI specification/runtime contributors |
 
-Develop with `nix develop --command make test`; output is
-`dist/plugin.fs.wasm`. The test transpiles the component with jco and exercises
-filesystem operations in a disposable directory. The local Project uses this
-built component for the published Files View.
+## Development
 
-## Local Project and documentation
+Install Nix; run native commands with `nix develop --command make <target>`. The pinned flake supplies WASI SDK, binding tools and Rust; Cargo locks the native Wasmtime tests. Dependency-free Node runs only the pinned wiki engine.
 
-```sh
-nix develop --command make open
-make serve-docs                 # http://localhost:8080; override DOCS_PORT
-make validate-docs
-make docs                       # portable site under build/site/
-```
+| Command | Purpose |
+| --- | --- |
+| `make build` | Compile the filesystem component under `build.nosync/`. |
+| `make package` | Build raw WASM, LICENSE, NOTICE and SHA256SUMS; unchanged output does no work. |
+| `make test` | Exercise the separate test component with native Cargo/Wasmtime and disposable preopens. |
+| `make open` | Build and open local `gams.json` in the released macOS Apple Silicon Host. |
+| `make serve-docs` | Serve pinned wiki; independent `DOCS_PORT` defaults to 8080. |
+| `make docs` | Build documentation into `build.nosync/site/`. |
+| `make validate-docs` | Validate documentation. |
+| `make clean` | Remove known generated output/docs and marked downloads; preserve supplied tools/Units and unidentified legacy output. |
 
-`make open` builds the component and opens this repository's `gams.json` with
-explicit `GAMS_APP_CWD`. If absent, `tools/gams.app` is downloaded from the latest
-GAMS macOS Apple Silicon release, with its accompanying notices retained.
-An existing download is never updated implicitly; Gatekeeper is not bypassed.
-No neighboring checkout is required. First launch needs network access for the
-Project's pinned published dependencies.
-
-The local Project loads the built plugin and the published Files View to browse
-Project files. It is not a plugin-specific editor or an API/runtime test.
-The wiki uses pinned `justgook/wiki` v1.4.0, cached under ignored `build/`.
-GitHub Pages builds with `make docs` on every push to `release`, independently of
-component releases. Set Pages source to **GitHub Actions** in repository settings.
-
-The component API and release safeguards remain documented in the repository README.
+The Host downloads only when absent, retains its notices and is not updated implicitly. Local `gams.json` uses the built filesystem component with the published Files View and unchanged supporting pins. The native filesystem suite is not a Host GUI test.
