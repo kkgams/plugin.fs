@@ -21,6 +21,6 @@ Install Nix; run native commands with `nix develop --command make <target>`. The
 | `make serve-docs` | Serve pinned wiki; independent `DOCS_PORT` defaults to 8080. |
 | `make docs` | Build documentation into `build.nosync/site/`. |
 | `make validate-docs` | Validate documentation. |
-| `make clean` | Remove known generated output/docs and marked downloads; preserve supplied tools/Units and unidentified legacy output. |
+| `make clean` | Remove all of `build.nosync/`, `tools/` and `gams_modules/`, including unmarked contents; refuse tracked files and symlinks before deleting anything. |
 
 The Host downloads only when absent, retains its notices and is not updated implicitly. Local `gams.json` uses the built filesystem component with the published Files View and unchanged supporting pins. The native filesystem suite is not a Host GUI test.
