@@ -92,11 +92,13 @@ static const char *error_code_name(wasi_filesystem_types_error_code_t code) {
   }
 }
 
-static uint64_t timestamp_seconds(wasi_filesystem_types_option_datetime_t timestamp) {
+static uint64_t
+timestamp_seconds(wasi_filesystem_types_option_datetime_t timestamp) {
   return timestamp.is_some ? timestamp.val.seconds : 0;
 }
 
-static const char *descriptor_type_name(wasi_filesystem_types_descriptor_type_t type) {
+static const char *
+descriptor_type_name(wasi_filesystem_types_descriptor_type_t type) {
   switch (type) {
   case WASI_FILESYSTEM_TYPES_DESCRIPTOR_TYPE_BLOCK_DEVICE:
     return "block-device";
@@ -240,15 +242,19 @@ static bool resolve_path(fs_proxy_string_t *path, resolved_path_t *resolved,
       size_t cwd_offset = string_eq(cwd->ptr, cwd->len, "/") ? 1 : 0;
       size_t cwd_len = cwd->len - cwd_offset;
       size_t sep_len = cwd_len > 0 && path->len > 0 ? 1 : 0;
-      if (cwd_len > SIZE_MAX - sep_len || cwd_len + sep_len > SIZE_MAX - path->len) {
-        wasi_filesystem_preopens_list_tuple2_own_descriptor_string_free(&resolved->preopens);
+      if (cwd_len > SIZE_MAX - sep_len ||
+          cwd_len + sep_len > SIZE_MAX - path->len) {
+        wasi_filesystem_preopens_list_tuple2_own_descriptor_string_free(
+            &resolved->preopens);
         set_error(err, "path is too long");
         return false;
       }
       resolved->fallback_len = cwd_len + sep_len + path->len;
-      resolved->fallback_alloc = malloc(resolved->fallback_len == 0 ? 1 : resolved->fallback_len);
+      resolved->fallback_alloc =
+          malloc(resolved->fallback_len == 0 ? 1 : resolved->fallback_len);
       if (!resolved->fallback_alloc) {
-        wasi_filesystem_preopens_list_tuple2_own_descriptor_string_free(&resolved->preopens);
+        wasi_filesystem_preopens_list_tuple2_own_descriptor_string_free(
+            &resolved->preopens);
         set_error(err, "out-of-memory");
         return false;
       }
@@ -305,7 +311,8 @@ static bool resolve_path(fs_proxy_string_t *path, resolved_path_t *resolved,
   }
 
   if (!found) {
-    wasi_filesystem_preopens_list_tuple2_own_descriptor_string_free(&resolved->preopens);
+    wasi_filesystem_preopens_list_tuple2_own_descriptor_string_free(
+        &resolved->preopens);
     set_error(err, "path is not under a WASI preopen");
     return false;
   }
@@ -317,7 +324,8 @@ static bool resolve_path(fs_proxy_string_t *path, resolved_path_t *resolved,
 
 static void resolved_path_free(resolved_path_t *resolved) {
   free(resolved->fallback_alloc);
-  wasi_filesystem_preopens_list_tuple2_own_descriptor_string_free(&resolved->preopens);
+  wasi_filesystem_preopens_list_tuple2_own_descriptor_string_free(
+      &resolved->preopens);
   memset(resolved, 0, sizeof(*resolved));
 }
 
@@ -326,11 +334,13 @@ static bool open_resolved_path_with_open_flags(
     wasi_filesystem_types_descriptor_flags_t flags,
     wasi_filesystem_types_own_descriptor_t *ret, bool *ret_is_preopen,
     fs_proxy_string_t *err) {
-  wasi_filesystem_types_borrow_descriptor_t base = wasi_filesystem_types_borrow_descriptor(
-      resolved->preopens.ptr[resolved->preopen_index].f0);
+  wasi_filesystem_types_borrow_descriptor_t base =
+      wasi_filesystem_types_borrow_descriptor(
+          resolved->preopens.ptr[resolved->preopen_index].f0);
 
   if (resolved->relative_len == 0) {
-    if (open_flags != 0 || (flags & WASI_FILESYSTEM_TYPES_DESCRIPTOR_FLAGS_WRITE) != 0) {
+    if (open_flags != 0 ||
+        (flags & WASI_FILESYSTEM_TYPES_DESCRIPTOR_FLAGS_WRITE) != 0) {
       set_error(err, "invalid path");
       return false;
     }
@@ -375,7 +385,8 @@ static bool open_resolved_path(resolved_path_t *resolved,
                                             ret_is_preopen, err);
 }
 
-static bool append_bytes(fs_proxy_list_u8_t *buffer, fs_proxy_list_u8_t *chunk) {
+static bool append_bytes(fs_proxy_list_u8_t *buffer,
+                         fs_proxy_list_u8_t *chunk) {
   if (chunk->len == 0) {
     return true;
   }
@@ -392,7 +403,8 @@ static bool append_bytes(fs_proxy_list_u8_t *buffer, fs_proxy_list_u8_t *chunk) 
   return true;
 }
 
-bool exports_gams_fs_fs_read_file(fs_proxy_string_t *path, fs_proxy_list_u8_t *ret,
+bool exports_gams_fs_fs_read_file(fs_proxy_string_t *path,
+                                  fs_proxy_list_u8_t *ret,
                                   fs_proxy_string_t *err) {
   ret->ptr = NULL;
   ret->len = 0;
@@ -404,13 +416,15 @@ bool exports_gams_fs_fs_read_file(fs_proxy_string_t *path, fs_proxy_list_u8_t *r
 
   wasi_filesystem_types_own_descriptor_t file;
   bool file_is_preopen = false;
-  if (!open_resolved_path(&resolved, WASI_FILESYSTEM_TYPES_DESCRIPTOR_FLAGS_READ,
-                          &file, &file_is_preopen, err)) {
+  if (!open_resolved_path(&resolved,
+                          WASI_FILESYSTEM_TYPES_DESCRIPTOR_FLAGS_READ, &file,
+                          &file_is_preopen, err)) {
     resolved_path_free(&resolved);
     return false;
   }
 
-  wasi_filesystem_types_borrow_descriptor_t borrowed = wasi_filesystem_types_borrow_descriptor(file);
+  wasi_filesystem_types_borrow_descriptor_t borrowed =
+      wasi_filesystem_types_borrow_descriptor(file);
   uint64_t offset = 0;
   bool eof = false;
 
@@ -456,7 +470,8 @@ bool exports_gams_fs_fs_read_file(fs_proxy_string_t *path, fs_proxy_list_u8_t *r
   return true;
 }
 
-bool exports_gams_fs_fs_read_text(fs_proxy_string_t *path, fs_proxy_string_t *ret,
+bool exports_gams_fs_fs_read_text(fs_proxy_string_t *path,
+                                  fs_proxy_string_t *ret,
                                   fs_proxy_string_t *err) {
   fs_proxy_list_u8_t bytes;
   if (!exports_gams_fs_fs_read_file(path, &bytes, err)) {
@@ -468,7 +483,8 @@ bool exports_gams_fs_fs_read_text(fs_proxy_string_t *path, fs_proxy_string_t *re
   return true;
 }
 
-bool exports_gams_fs_fs_write_file(fs_proxy_string_t *path, fs_proxy_list_u8_t *data,
+bool exports_gams_fs_fs_write_file(fs_proxy_string_t *path,
+                                   fs_proxy_list_u8_t *data,
                                    fs_proxy_string_t *err) {
   resolved_path_t resolved;
   if (!resolve_path(path, &resolved, err)) {
@@ -487,7 +503,8 @@ bool exports_gams_fs_fs_write_file(fs_proxy_string_t *path, fs_proxy_list_u8_t *
     return false;
   }
 
-  wasi_filesystem_types_borrow_descriptor_t borrowed = wasi_filesystem_types_borrow_descriptor(file);
+  wasi_filesystem_types_borrow_descriptor_t borrowed =
+      wasi_filesystem_types_borrow_descriptor(file);
   size_t offset = 0;
   while (offset < data->len) {
     fs_proxy_list_u8_t chunk = {
@@ -497,7 +514,8 @@ bool exports_gams_fs_fs_write_file(fs_proxy_string_t *path, fs_proxy_list_u8_t *
     wasi_filesystem_types_filesize_t written = 0;
     wasi_filesystem_types_error_code_t code = 0;
     bool ok = wasi_filesystem_types_method_descriptor_write(
-        borrowed, &chunk, (wasi_filesystem_types_filesize_t)offset, &written, &code);
+        borrowed, &chunk, (wasi_filesystem_types_filesize_t)offset, &written,
+        &code);
     if (!ok) {
       if (!file_is_preopen) {
         wasi_filesystem_types_descriptor_drop_own(file);
@@ -534,7 +552,8 @@ bool exports_gams_fs_fs_write_file(fs_proxy_string_t *path, fs_proxy_list_u8_t *
   return true;
 }
 
-bool exports_gams_fs_fs_write_text(fs_proxy_string_t *path, fs_proxy_string_t *text,
+bool exports_gams_fs_fs_write_text(fs_proxy_string_t *path,
+                                   fs_proxy_string_t *text,
                                    fs_proxy_string_t *err) {
   fs_proxy_list_u8_t data = {
       .ptr = text->ptr,
@@ -543,19 +562,21 @@ bool exports_gams_fs_fs_write_text(fs_proxy_string_t *path, fs_proxy_string_t *t
   return exports_gams_fs_fs_write_file(path, &data, err);
 }
 
-typedef bool (*resolved_path_op_t)(wasi_filesystem_types_borrow_descriptor_t self,
-                                  fs_proxy_string_t *path,
-                                  wasi_filesystem_types_error_code_t *err);
+typedef bool (*resolved_path_op_t)(
+    wasi_filesystem_types_borrow_descriptor_t self, fs_proxy_string_t *path,
+    wasi_filesystem_types_error_code_t *err);
 
-static bool call_resolved_path_op(resolved_path_t *resolved, resolved_path_op_t op,
+static bool call_resolved_path_op(resolved_path_t *resolved,
+                                  resolved_path_op_t op,
                                   fs_proxy_string_t *err) {
   if (resolved->relative_len == 0) {
     set_error(err, "invalid path");
     return false;
   }
 
-  wasi_filesystem_types_borrow_descriptor_t base = wasi_filesystem_types_borrow_descriptor(
-      resolved->preopens.ptr[resolved->preopen_index].f0);
+  wasi_filesystem_types_borrow_descriptor_t base =
+      wasi_filesystem_types_borrow_descriptor(
+          resolved->preopens.ptr[resolved->preopen_index].f0);
   fs_proxy_string_t relative = {
       .ptr = (uint8_t *)resolved->relative_ptr,
       .len = resolved->relative_len,
@@ -581,18 +602,21 @@ static bool call_resolved_path_op(resolved_path_t *resolved, resolved_path_op_t 
   return true;
 }
 
-bool exports_gams_fs_fs_create_dir(fs_proxy_string_t *path, fs_proxy_string_t *err) {
+bool exports_gams_fs_fs_create_dir(fs_proxy_string_t *path,
+                                   fs_proxy_string_t *err) {
   resolved_path_t resolved;
   if (!resolve_path(path, &resolved, err)) {
     return false;
   }
   bool ok = call_resolved_path_op(
-      &resolved, wasi_filesystem_types_method_descriptor_create_directory_at, err);
+      &resolved, wasi_filesystem_types_method_descriptor_create_directory_at,
+      err);
   resolved_path_free(&resolved);
   return ok;
 }
 
-bool exports_gams_fs_fs_remove_file(fs_proxy_string_t *path, fs_proxy_string_t *err) {
+bool exports_gams_fs_fs_remove_file(fs_proxy_string_t *path,
+                                    fs_proxy_string_t *err) {
   resolved_path_t resolved;
   if (!resolve_path(path, &resolved, err)) {
     return false;
@@ -603,13 +627,15 @@ bool exports_gams_fs_fs_remove_file(fs_proxy_string_t *path, fs_proxy_string_t *
   return ok;
 }
 
-bool exports_gams_fs_fs_remove_dir(fs_proxy_string_t *path, fs_proxy_string_t *err) {
+bool exports_gams_fs_fs_remove_dir(fs_proxy_string_t *path,
+                                   fs_proxy_string_t *err) {
   resolved_path_t resolved;
   if (!resolve_path(path, &resolved, err)) {
     return false;
   }
   bool ok = call_resolved_path_op(
-      &resolved, wasi_filesystem_types_method_descriptor_remove_directory_at, err);
+      &resolved, wasi_filesystem_types_method_descriptor_remove_directory_at,
+      err);
   resolved_path_free(&resolved);
   return ok;
 }
@@ -656,18 +682,20 @@ bool exports_gams_fs_fs_rename(fs_proxy_string_t *from, fs_proxy_string_t *to,
   wasi_filesystem_types_borrow_descriptor_t new_base;
   fs_proxy_string_t old_relative;
   fs_proxy_string_t new_relative;
-  resolved_path_borrow_base_and_path(&old_path, false, &old_base, &old_relative);
-  resolved_path_borrow_base_and_path(&new_path, false, &new_base, &new_relative);
+  resolved_path_borrow_base_and_path(&old_path, false, &old_base,
+                                     &old_relative);
+  resolved_path_borrow_base_and_path(&new_path, false, &new_base,
+                                     &new_relative);
 
   wasi_filesystem_types_error_code_t code = 0;
   bool ok = wasi_filesystem_types_method_descriptor_rename_at(
       old_base, &old_relative, new_base, &new_relative, &code);
   if (!ok && code == WASI_FILESYSTEM_TYPES_ERROR_CODE_NOT_PERMITTED &&
       (old_path.has_fallback || new_path.has_fallback)) {
-    resolved_path_borrow_base_and_path(&old_path, old_path.has_fallback, &old_base,
-                                       &old_relative);
-    resolved_path_borrow_base_and_path(&new_path, new_path.has_fallback, &new_base,
-                                       &new_relative);
+    resolved_path_borrow_base_and_path(&old_path, old_path.has_fallback,
+                                       &old_base, &old_relative);
+    resolved_path_borrow_base_and_path(&new_path, new_path.has_fallback,
+                                       &new_base, &new_relative);
     code = 0;
     ok = wasi_filesystem_types_method_descriptor_rename_at(
         old_base, &old_relative, new_base, &new_relative, &code);
@@ -696,7 +724,8 @@ bool exports_gams_fs_fs_stat(fs_proxy_string_t *path,
 
   wasi_filesystem_types_own_descriptor_t descriptor;
   bool descriptor_is_preopen = false;
-  if (!open_resolved_path(&resolved, WASI_FILESYSTEM_TYPES_DESCRIPTOR_FLAGS_READ,
+  if (!open_resolved_path(&resolved,
+                          WASI_FILESYSTEM_TYPES_DESCRIPTOR_FLAGS_READ,
                           &descriptor, &descriptor_is_preopen, err)) {
     resolved_path_free(&resolved);
     return false;
@@ -742,7 +771,8 @@ bool exports_gams_fs_fs_list(fs_proxy_string_t *path,
 
   wasi_filesystem_types_own_descriptor_t directory;
   bool directory_is_preopen = false;
-  if (!open_resolved_path(&resolved, WASI_FILESYSTEM_TYPES_DESCRIPTOR_FLAGS_READ,
+  if (!open_resolved_path(&resolved,
+                          WASI_FILESYSTEM_TYPES_DESCRIPTOR_FLAGS_READ,
                           &directory, &directory_is_preopen, err)) {
     resolved_path_free(&resolved);
     return false;
@@ -764,8 +794,10 @@ bool exports_gams_fs_fs_list(fs_proxy_string_t *path,
   while (true) {
     wasi_filesystem_types_option_directory_entry_t entry;
     code = 0;
-    ok = wasi_filesystem_types_method_directory_entry_stream_read_directory_entry(
-        wasi_filesystem_types_borrow_directory_entry_stream(stream), &entry, &code);
+    ok =
+        wasi_filesystem_types_method_directory_entry_stream_read_directory_entry(
+            wasi_filesystem_types_borrow_directory_entry_stream(stream), &entry,
+            &code);
     if (!ok) {
       wasi_filesystem_types_directory_entry_stream_drop_own(stream);
       if (!directory_is_preopen) {
@@ -815,7 +847,8 @@ bool exports_gams_fs_fs_list(fs_proxy_string_t *path,
 
     ret->ptr = next;
     exports_gams_fs_fs_dir_entry_t *out = &ret->ptr[ret->len];
-    fs_proxy_string_dup_n(&out->name, (const char *)entry.val.name.ptr, entry.val.name.len);
+    fs_proxy_string_dup_n(&out->name, (const char *)entry.val.name.ptr,
+                          entry.val.name.len);
     fs_proxy_string_dup(&out->type, descriptor_type_name(entry.val.type));
     ret->len += 1;
 
